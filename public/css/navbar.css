@@ -1,0 +1,170 @@
+/* Navbar Stilleri */
+.navbar {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4f46e5;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navbar-brand i {
+    font-size: 1.75rem;
+}
+
+.navbar-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.navbar-item {
+    color: #374151;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.navbar-item:hover {
+    color: #4f46e5;
+}
+
+.profile-dropdown {
+    position: relative;
+    cursor: pointer;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #4f46e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: background-color 0.3s;
+    overflow: hidden;
+    position: relative;
+}
+
+.profile-icon i,
+.profile-icon i:before,
+.profile-icon i:after,
+.profile-icon .fas,
+.profile-icon .fa-user,
+.profile-icon svg,
+.profile-icon svg * {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+    font-size: 1.25rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+.profile-icon:hover {
+    background-color: #4338ca;
+}
+
+.profile-icon:hover i,
+.profile-icon:hover i:before,
+.profile-icon:hover i:after,
+.profile-icon:hover .fas,
+.profile-icon:hover .fa-user,
+.profile-icon:hover svg,
+.profile-icon:hover svg * {
+    color: #ffffff !important;
+    fill: #ffffff !important;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    min-width: 200px;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    margin-top: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s;
+}
+
+.profile-dropdown:hover .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-info {
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.user-info p {
+    margin: 0;
+    font-weight: 500;
+    color: #374151;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    color: #6b7280;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.dropdown-item:hover {
+    background-color: #f3f4f6;
+    color: #4f46e5;
+    border-radius: 0.25rem;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 768px) {
+    .navbar-menu {
+        gap: 1rem;
+    }
+    
+    .navbar-item {
+        font-size: 0.875rem;
+    }
+} 

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog - PawFinder</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .blog-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .blog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .create-blog-btn {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .create-blog-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .blog-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .blog-card-content {
+            padding: 1.5rem;
+        }
+
+        .blog-card h3 {
+            margin: 0 0 1rem 0;
+            color: #374151;
+        }
+
+        .blog-card p {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .read-more-btn {
+            display: inline-block;
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .read-more-btn:hover {
+            background-color: #4338ca;
+        }
+
+        /* Blog Detay Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            margin: 2rem auto;
+            padding: 2rem;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 1rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            line-height: 1.8;
+            color: #4b5563;
+            margin-bottom: 1rem;
+        }
+
+        .blog-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .blog-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .blog-meta-item i {
+            color: #4f46e5;
+            width: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blog-container">
+            <div class="blog-header">
+                <h1>Blog Yazıları</h1>
+                <div id="adminControls" style="display: none;">
+                    <a href="/create-blog.html" class="create-blog-btn">
+                        <i class="fas fa-plus"></i> Yeni Blog Yazısı
+                    </a>
+                </div>
+            </div>
+            
+            <div id="blogGrid" class="blog-grid">
+                <!-- Blog yazıları buraya dinamik olarak eklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Blog Detay Modal -->
+    <div id="blogModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modalContent">
+                <!-- Blog detayları buraya dinamik olarak eklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script>
+        // Admin kontrolü
+        async function checkAdminStatus() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await fetch('/api/profile', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const userData = await response.json();
+
+                    if (userData.isAdmin) {
+                        document.getElementById('adminControls').style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Admin kontrolü hatası:', error);
+                }
+            }
+        }
+
+        // Sayfa yüklendiğinde admin kontrolü yap
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminStatus();
+            loadBlogs();
+        });
+
+        // Modal işlemleri
+        const modal = document.getElementById('blogModal');
+        const closeModal = document.querySelector('.close-modal');
+
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Blog yazılarını getir
+        async function loadBlogs() {
+            try {
+                const response = await fetch('/api/blogs');
+                const blogs = await response.json();
+
+                const blogGrid = document.getElementById('blogGrid');
+                blogGrid.innerHTML = '';
+
+                blogs.forEach(blog => {
+                    const blogCard = document.createElement('div');
+                    blogCard.className = 'blog-card';
+                    blogCard.innerHTML = `
+                        <img src="${blog.imageUrl}" alt="${blog.title}">
+                        <div class="blog-card-content">
+                            <h3>${blog.title}</h3>
+                            <div class="blog-meta">
+                                <div class="blog-meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Oluşturulma: ${formatDate(blog.createdAt)}</span>
+                                </div>
+                                <div class="blog-meta-item">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Son Güncelleme: ${formatDate(blog.updatedAt)}</span>
+                                </div>
+                            </div>
+                            <p>${blog.description}</p>
+                            <a href="/blog-detail.html?id=${blog.blogNo}" class="read-more-btn">
+                                Devamını Oku
+                            </a>
+                        </div>
+                    `;
+                    blogGrid.appendChild(blogCard);
+                });
+            } catch (error) {
+                console.error('Blog yazıları yüklenirken hata:', error);
+            }
+        }
+
+        // Blog detayını göster
+        async function showBlogDetail(blogNo) {
+            try {
+                const response = await fetch(`/api/blogs/${blogNo}`);
+                const blog = await response.json();
+
+                const modalContent = document.getElementById('modalContent');
+                modalContent.innerHTML = `
+                    <img src="${blog.imageUrl}" alt="${blog.title}" class="modal-image">
+                    <h2 class="modal-title">${blog.title}</h2>
+                    <p>${blog.content}</p>
+                `;
+
+                modal.style.display = "block";
+            } catch (error) {
+                console.error('Blog detayı yüklenirken hata:', error);
+            }
+        }
+
+        // Tarihi formatla
+        function formatDate(dateString) {
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateString).toLocaleDateString('tr-TR', options);
+        }
+    </script>
+</body>
+</html>

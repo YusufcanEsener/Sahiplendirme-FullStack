@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni İlan Oluştur - PawFinder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .form {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="createAdForm" class="form">
+            <h2>Yeni İlan Oluştur</h2>
+            
+            <div class="form-group">
+                <label for="cins">Hayvan Cinsi</label>
+                <input type="text" id="cins" name="cins" required placeholder="Örn: Golden Retriever">
+            </div>
+
+            <div class="form-group">
+                <label for="yas">Yaş</label>
+                <input type="number" id="yas" name="yas" required min="0" placeholder="Örn: 2">
+            </div>
+
+            <div class="form-group">
+                <label for="cinsiyet">Cinsiyet</label>
+                <select id="cinsiyet" name="cinsiyet" required>
+                    <option value="">Seçiniz</option>
+                    <option value="Erkek">Erkek</option>
+                    <option value="Dişi">Dişi</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="saglik_durumu">Sağlık Durumu</label>
+                <textarea id="saglik_durumu" name="saglik_durumu" required placeholder="Hayvanın sağlık durumunu detaylı bir şekilde açıklayın"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="karakter_ozellikleri">Karakter Özellikleri</label>
+                <textarea id="karakter_ozellikleri" name="karakter_ozellikleri" required placeholder="Hayvanın karakter özelliklerini detaylı bir şekilde açıklayın"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="bulundugu_yer">Bulunduğu Yer</label>
+                <input type="text" id="bulundugu_yer" name="bulundugu_yer" required placeholder="Örn: Kadıköy, İstanbul">
+            </div>
+
+            <div class="form-group">
+                <label for="iletisim_no">İletişim Numarası</label>
+                <input type="tel" id="iletisim_no" name="iletisim_no" required placeholder="Örn: 0555 555 55 55">
+            </div>
+
+            <div class="form-group">
+                <label for="hikaye">Hikaye</label>
+                <textarea id="hikaye" name="hikaye" required placeholder="Hayvanın hikayesini detaylı bir şekilde anlatın"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="resim_url">Resim URL</label>
+                <input type="url" id="resim_url" name="resim_url" required placeholder="Resim URL'sini girin">
+            </div>
+
+            <button type="submit" class="submit-btn">İlanı Oluştur</button>
+        </form>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script>
+        // Sayfa yüklendiğinde admin kontrolü yap
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const userData = await response.json();
+
+                if (!userData.isAdmin) {
+                    alert('Bu sayfaya erişim yetkiniz yok!');
+                    window.location.href = '/';
+                    return;
+                }
+            } catch (error) {
+                console.error('Yetki kontrolü hatası:', error);
+                window.location.href = '/';
+                return;
+            }
+        });
+
+        document.getElementById('createAdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                cins: document.getElementById('cins').value,
+                yas: parseInt(document.getElementById('yas').value),
+                cinsiyet: document.getElementById('cinsiyet').value,
+                saglik_durumu: document.getElementById('saglik_durumu').value,
+                karakter_ozellikleri: document.getElementById('karakter_ozellikleri').value,
+                bulundugu_yer: document.getElementById('bulundugu_yer').value,
+                iletisim_no: document.getElementById('iletisim_no').value,
+                hikaye: document.getElementById('hikaye').value,
+                resim_url: document.getElementById('resim_url').value
+            };
+
+            try {
+                const response = await fetch('/api/ads', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('İlan başarıyla oluşturuldu!');
+                    window.location.href = '/shelters.html';
+                } else {
+                    alert(data.message || 'İlan oluşturulurken bir hata oluştu');
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+                alert('Bir hata oluştu');
+            }
+        });
+    </script>
+</body>
+</html> 

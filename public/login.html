@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap - PawFinder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div id="alreadyLoggedInMessage" style="display: none; text-align: center; margin: 20px;">
+            <h2>Zaten Giriş Yapmışsınız</h2>
+            <p>Giriş yapmış durumdasınız. Ana sayfaya dönmek için <a href="/">tıklayın</a>.</p>
+        </div>
+        
+        <form id="loginForm" class="form">
+            <h2>Giriş Yap</h2>
+            <div class="form-group">
+                <input type="email" id="email" name="email" required placeholder="E-posta">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" name="password" required placeholder="Şifre">
+            </div>
+            <button type="submit">Giriş Yap</button>
+            <p>Hesabınız yok mu? <a href="register.html">Kayıt Ol</a></p>
+        </form>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script>
+        // Sayfa yüklendiğinde kullanıcı oturum durumunu kontrol et
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Kullanıcı zaten giriş yapmışsa formu gizle ve uyarı mesajını göster
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('alreadyLoggedInMessage').style.display = 'block';
+            }
+        });
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    // Admin kontrolü
+                    if (data.user.isAdmin) {
+                        window.location.href = '/index.html';
+                    } else {
+                        window.location.href = '/index.html';
+                    }
+                } else {
+                    alert(data.message || 'Giriş başarısız');
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+                alert('Bir hata oluştu');
+            }
+        });
+    </script>
+</body>
+</html>

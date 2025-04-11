@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kayıt Ol - PawFinder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div id="alreadyLoggedInMessage" style="display: none; text-align: center; margin: 20px;">
+            <h2>Zaten Giriş Yapmışsınız</h2>
+            <p>Giriş yapmış durumdasınız. Ana sayfaya dönmek için <a href="/">tıklayın</a>.</p>
+        </div>
+
+        <form id="registerForm" class="form">
+            <h2>Kayıt Ol</h2>
+            <div class="form-group">
+                <input type="text" id="firstName" name="firstName" required placeholder="Ad">
+            </div>
+            <div class="form-group">
+                <input type="text" id="lastName" name="lastName" required placeholder="Soyad">
+            </div>
+            <div class="form-group">
+                <input type="email" id="email" name="email" required placeholder="E-posta">
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" name="password" required minlength="6" placeholder="Şifre">
+            </div>
+            <div class="form-group">
+                <input type="date" id="birthDate" name="birthDate" required>
+            </div>
+            <button type="submit">Kayıt Ol</button>
+            <p>Zaten hesabınız var mı? <a href="login.html">Giriş Yap</a></p>
+        </form>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script>
+        // Sayfa yüklendiğinde kullanıcı oturum durumunu kontrol et
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Kullanıcı zaten giriş yapmışsa formu gizle ve uyarı mesajını göster
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('alreadyLoggedInMessage').style.display = 'block';
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                birthDate: document.getElementById('birthDate').value
+            };
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Kayıt başarılı! Giriş yapabilirsiniz.');
+                    window.location.href = '/login.html';
+                } else {
+                    alert(data.message || 'Kayıt başarısız');
+                }
+            } catch (error) {
+                console.error('Hata:', error);
+                alert('Bir hata oluştu');
+            }
+        });
+    </script>
+</body>
+</html>

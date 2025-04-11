@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlan Detayı - PawFinder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .ad-detail-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .ad-header {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .ad-image {
+            width: 400px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+
+        .ad-info {
+            flex: 1;
+        }
+
+        .ad-title {
+            font-size: 2rem;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+
+        .ad-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+        }
+
+        .meta-item i {
+            color: #4f46e5;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .ad-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            color: #374151;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .section-title i {
+            color: #4f46e5;
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .section-content {
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .back-button:hover {
+            color: #4f46e5;
+        }
+
+        @media (max-width: 768px) {
+            .ad-header {
+                flex-direction: column;
+            }
+
+            .ad-image {
+                width: 100%;
+                height: 250px;
+            }
+
+            .ad-meta {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/shelters.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> İlanlara Dön
+        </a>
+
+        <div id="adDetail" class="ad-detail-container">
+            <!-- İlan detayları buraya dinamik olarak eklenecek -->
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script>
+        async function loadAdDetail() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const adId = urlParams.get('id');
+
+                if (!adId) {
+                    window.location.href = '/shelters.html';
+                    return;
+                }
+
+                const response = await fetch(`/api/ads/${adId}`);
+                const ad = await response.json();
+
+                const container = document.getElementById('adDetail');
+                container.innerHTML = `
+                    <div class="ad-header">
+                        <img src="${ad.resim_url}" alt="${ad.cins}" class="ad-image">
+                        <div class="ad-info">
+                            <h1 class="ad-title">${ad.cins}</h1>
+                            <div class="ad-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>${ad.bulundugu_yer}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-birthday-cake"></i>
+                                    <span>${ad.yas} yaşında</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-venus-mars"></i>
+                                    <span>${ad.cinsiyet}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>${ad.iletisim_no}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Oluşturulma: ${formatDate(ad.createdAt)}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Son Güncelleme: ${formatDate(ad.updatedAt)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ad-section">
+                        <h2 class="section-title"><i class="fas fa-heartbeat"></i> Sağlık Durumu</h2>
+                        <p class="section-content">${ad.saglik_durumu}</p>
+                    </div>
+
+                    <div class="ad-section">
+                        <h2 class="section-title"><i class="fas fa-paw"></i> Karakter Özellikleri</h2>
+                        <p class="section-content">${ad.karakter_ozellikleri}</p>
+                    </div>
+
+                    <div class="ad-section">
+                        <h2 class="section-title"><i class="fas fa-book"></i> Hikaye</h2>
+                        <p class="section-content">${ad.hikaye}</p>
+                    </div>
+
+                    <div class="contact-buttons">
+                        <a href="tel:${ad.iletisim_no}" class="btn btn-primary">
+                            <i class="fas fa-phone"></i> Ara
+                        </a>
+                        <a href="mailto:info@pawfinder.com" class="btn btn-secondary">
+                            <i class="fas fa-envelope"></i> E-posta
+                        </a>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('İlan detayları yüklenirken hata oluştu:', error);
+                window.location.href = '/shelters.html';
+            }
+        }
+
+        function formatDate(dateString) {
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            return new Date(dateString).toLocaleDateString('tr-TR', options);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAdDetail);
+    </script>
+</body>
+</html> 

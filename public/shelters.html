@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlanlar - PawFinder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .shelters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+
+        .shelter-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .shelter-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .shelter-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .shelter-card-content {
+            padding: 1.5rem;
+        }
+
+        .shelter-card-content h3 {
+            margin: 0 0 0.5rem 0;
+            color: #374151;
+        }
+
+        .shelter-card-content p {
+            margin: 0.5rem 0;
+            color: #6b7280;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-filters input,
+        .search-filters select {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-filters button {
+            padding: 0.5rem 1rem;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .search-filters button:hover {
+            background-color: #4338ca;
+        }
+
+        @media (max-width: 768px) {
+            .search-filters {
+                flex-direction: column;
+            }
+            
+            .search-filters input,
+            .search-filters select,
+            .search-filters button {
+                width: 100%;
+            }
+        }
+
+        .ad-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            color: #6b7280;
+        }
+
+        .ad-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ad-info i {
+            color: #4f46e5;
+        }
+
+        .ad-date {
+            margin: 0.5rem 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .ad-date span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ad-date i {
+            color: #4f46e5;
+        }
+
+        .ad-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hayvan İlanları</h1>
+        <div class="search-filters">
+            <input type="text" id="searchInput" placeholder="İlan ara...">
+            <select id="locationFilter">
+                <option value="">Tüm Şehirler</option>
+                <option value="istanbul">İstanbul</option>
+                <option value="ankara">Ankara</option>
+                <option value="izmir">İzmir</option>
+            </select>
+            <button onclick="filterAds()">Ara</button>
+        </div>
+        
+        <div id="adsContainer" class="shelters-grid">
+            <!-- İlanlar buraya dinamik olarak eklenecek -->
+        </div>
+    </div>
+
+    <script src="js/navbar.js"></script>
+    <script>
+        function formatDate(dateString) {
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            };
+            return new Date(dateString).toLocaleDateString('tr-TR', options);
+        }
+
+        async function loadAds() {
+            try {
+                const response = await fetch('/api/ads');
+                const ads = await response.json();
+                
+                const container = document.getElementById('adsContainer');
+                container.innerHTML = ''; // Mevcut içeriği temizle
+                
+                ads.forEach(ad => {
+                    const card = document.createElement('div');
+                    card.className = 'shelter-card';
+                    card.innerHTML = `
+                        <img src="${ad.resim_url}" alt="${ad.cins}" class="ad-image">
+                        <div class="shelter-card-content">
+                            <h3>${ad.cins}</h3>
+                            <div class="ad-info">
+                                <span><i class="fas fa-map-marker-alt"></i> ${ad.bulundugu_yer}</span>
+                                <span><i class="fas fa-birthday-cake"></i> ${ad.yas} yaşında</span>
+                                <span><i class="fas fa-venus-mars"></i> ${ad.cinsiyet}</span>
+                            </div>
+                            <div class="ad-date">
+                                <span><i class="fas fa-calendar"></i> ${formatDate(ad.createdAt)}</span>
+                            </div>
+                            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                                <a href="tel:${ad.iletisim_no}" class="btn btn-primary">Ara</a>
+                                <a href="mailto:info@pawfinder.com" class="btn btn-secondary">E-posta</a>
+                                <a href="/ad-detay.html?id=${ad._id}" class="btn btn-info">Detay</a>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('İlanlar yüklenirken hata oluştu:', error);
+            }
+        }
+
+        function filterAds() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const location = document.getElementById('locationFilter').value.toLowerCase();
+            
+            const cards = document.querySelectorAll('.shelter-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const locationText = card.querySelector('.ad-info').textContent.toLowerCase();
+                
+                const matchesSearch = title.includes(searchTerm);
+                const matchesLocation = !location || locationText.includes(location);
+                
+                card.style.display = matchesSearch && matchesLocation ? 'block' : 'none';
+            });
+        }
+
+        // Sayfa yüklendiğinde ilanları getir
+        document.addEventListener('DOMContentLoaded', loadAds);
+    </script>
+</body>
+</html>
