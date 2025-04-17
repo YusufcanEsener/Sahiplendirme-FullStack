@@ -9,6 +9,8 @@ import User from './models/User.js';
 import dotenv from 'dotenv';
 import Ad from './models/Ad.js';
 import Blog from './models/Blog.js';
+import swaggerUi from 'swagger-ui-express';
+import specs from './docs/swagger.js';
 
 dotenv.config();
 
@@ -17,6 +19,9 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Middleware
 app.use(express.json());
@@ -35,9 +40,10 @@ mongoose.connect('mongodb://localhost:27017/remzi_db', {
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'public', 'index.html'));
 });
+
 app.get('/blog', (req, res) => {
     res.sendFile(join(__dirname, 'public', 'blog.html'));
-  });
+});
 
 app.get('/login', (req, res) => {
   res.sendFile(join(__dirname, 'public', 'login.html'));
@@ -275,7 +281,7 @@ app.post('/api/login', async (req, res) => {
 // Blog API'leri
 app.post('/api/blogs', authenticateToken, async (req, res) => {
     try {
-        console.log('Blog oluşturma isteği:', req.body); // Hata ayıklama için
+        console.log('Blog oluşturma isteği:', req.body);
 
         const { title, description, content, imageUrl } = req.body;
         
@@ -287,14 +293,14 @@ app.post('/api/blogs', authenticateToken, async (req, res) => {
             createdAt: new Date()
         });
         
-        console.log('Oluşturulan blog:', blog); // Hata ayıklama için
+        console.log('Oluşturulan blog:', blog);
         
         const savedBlog = await blog.save();
-        console.log('Kaydedilen blog:', savedBlog); // Hata ayıklama için
+        console.log('Kaydedilen blog:', savedBlog);
         
         res.status(201).json(savedBlog);
     } catch (error) {
-        console.error('Blog oluşturma hatası:', error); // Detaylı hata bilgisi
+        console.error('Blog oluşturma hatası:', error);
         res.status(500).json({ 
             message: 'Blog oluşturulurken bir hata oluştu',
             error: error.message 
