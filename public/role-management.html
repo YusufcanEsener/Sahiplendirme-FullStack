@@ -325,7 +325,7 @@
                     <td>
                         <span class="role-badge role-${user.role || 'user'}">
                             <i class="fas fa-${user.role === 'shelter' ? 'house' : user.role === 'admin' ? 'crown' : 'user'}"></i>
-                            ${user.role || 'user'}
+                            ${user.role === 'shelter' ? 'Barınak Sahibi' : user.role === 'admin' ? 'Admin' : 'Kullanıcı'}
                         </span>
                     </td>
                     <td>
