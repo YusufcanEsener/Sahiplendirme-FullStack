@@ -4,60 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate - PawFinder</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/donate.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Support Our Mission</h1>
-        <div class="donation-options">
-            <div class="donation-card">
-                <h3>One-Time Donation</h3>
-                <div class="amount-buttons">
-                    <button class="btn btn-secondary">₺100</button>
-                    <button class="btn btn-secondary">₺250</button>
-                    <button class="btn btn-secondary">₺500</button>
-                    <button class="btn btn-secondary">₺1000</button>
-                </div>
-                <input type="number" placeholder="Custom Amount" class="custom-amount">
-                <button class="btn btn-primary">Donate Now</button>
-            </div>
-            
-            <div class="donation-card">
-                <h3>Monthly Support</h3>
-                <div class="amount-buttons">
-                    <button class="btn btn-secondary">₺50/month</button>
-                    <button class="btn btn-secondary">₺100/month</button>
-                    <button class="btn btn-secondary">₺250/month</button>
-                </div>
-                <input type="number" placeholder="Custom Monthly Amount" class="custom-amount">
-                <button class="btn btn-primary">Start Monthly Support</button>
-            </div>
+        <h1 class="page-title">Hayvanların Yanında Ol!</h1>
+        <p class="page-subtitle">Bağışlarınız, sokak hayvanlarının yaşamını kurtarmada önemli bir fark yaratabilir.</p> 
+
+        <!-- Bağış Bilgisi -->
+        <div class="donation-info">
+            <p>Hayvanlar, insanların sevgisine ve ilgisine ihtiyaç duyarlar. Birçok sokak hayvanı soğuk kış günlerinde, açlık ve susuzlukla mücadele ederken, onlara yardımcı olmak hepimizin sorumluluğudur.</p>
+            <p>Bağışlarınızla, hastalanmış hayvanların tedavi edilmesini, yiyecek ve barınma sağlanmasını ve onların bir yuva bulmalarına yardımcı olunmasını sağlayabilirsiniz. Bir cana dokunmak, dünyayı değiştirebilir.</p>
+            <p><strong>Birlikte daha güçlü bir fark yaratabiliriz!</strong></p>
         </div>
-        
-        <div class="impact-section">
-            <h2>Your Impact</h2>
-            <div class="impact-grid">
-                <div class="impact-card">
-                    <div class="impact-icon">🏠</div>
-                    <h3>Find Homes</h3>
-                    <p>Help pets find their forever homes</p>
+
+        <div class="donation-grid">
+            <!-- TOG -->
+            <a href="https://www.tog.org.tr/bagis-yap" target="_blank" class="donation-card">
+                <img src="https://www.tog.org.tr/images/marka/tog-logo.svg" alt="TOG">
+                <div class="donation-content">
+                    <h3>TOG (Toplum Gönüllüleri Vakfı)</h3>
+                    <p>Desteklerinizle gençlerin sosyal sorumluluk projelerine katkıda bulunun.</p>
+                    <button class="btn btn-primary">Bağış Yap</button>
                 </div>
-                <div class="impact-card">
-                    <div class="impact-icon">❤️</div>
-                    <h3>Save Lives</h3>
-                    <p>Support rescue and rehabilitation</p>
+            </a>
+
+            <!-- THKD -->
+            <a href="https://www.thkd.org.tr/bagis.php" target="_blank" class="donation-card">
+                <img src="https://www.thkd.org.tr/dimg/27704LOGO-02.svg" alt="THKD">
+                <div class="donation-content">
+                    <h3>THKD (Türkiye Hayvanları Koruma Derneği)</h3>
+                    <p>Türk Hava Kurumu'na bağış yaparak topluma katkıda bulunun.</p>
+                    <button class="btn btn-primary">Bağış Yap</button>
                 </div>
-                <div class="impact-card">
-                    <div class="impact-icon">🏥</div>
-                    <h3>Provide Care</h3>
-                    <p>Fund medical treatments and care</p>
+            </a>
+
+            <!-- HACİKO -->
+            <a href="https://fonzip.com/haciko/bagis" target="_blank" class="donation-card">
+                <img src="https://cdn.fonzip.com/public/haciko/img/logo/blob-1659386804915.png" alt="HACİKO">
+                <div class="donation-content">
+                    <h3>HACİKO (Hayvanları Çaresizlikten ve İlgisizlikten Koruma Derneği)</h3>
+                    <p>Hayvanların yaşam koşullarını iyileştirmek için bağış yapın.</p>
+                    <button class="btn btn-primary">Bağış Yap</button>
                 </div>
-            </div>
+            </a>
         </div>
     </div>
 
+    <div class="notification-container"></div>
+
     <script src="js/navbar.js"></script>
+    <script src="js/notification.js"></script>
 </body>
 </html>

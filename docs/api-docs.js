@@ -24,6 +24,9 @@
  *         birthDate:
  *           type: string
  *           format: date
+ *         isAdmin:
+ *           type: number
+ *           default: 0
  * 
  *     Ad:
  *       type: object
@@ -66,6 +69,8 @@
  *         - content
  *         - imageUrl
  *       properties:
+ *         blogNo:
+ *           type: number
  *         title:
  *           type: string
  *         description:
@@ -272,6 +277,331 @@
  *     responses:
  *       200:
  *         description: Blog yazısı detayları
+ *       404:
+ *         description: Blog yazısı bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Kullanıcı bilgilerini günceller
+ *     tags: [Kullanıcı]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               birthDate:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       200:
+ *         description: Kullanıcı başarıyla güncellendi
+ *       400:
+ *         description: Geçersiz istek
+ *       401:
+ *         description: Yetkilendirme gerekli
+ *       403:
+ *         description: Yetkisiz işlem
+ *       404:
+ *         description: Kullanıcı bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Kullanıcıyı siler
+ *     tags: [Kullanıcı]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Kullanıcı başarıyla silindi
+ *       401:
+ *         description: Yetkilendirme gerekli
+ *       403:
+ *         description: Yetkisiz işlem
+ *       404:
+ *         description: Kullanıcı bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/blogs/{blogNo}:
+ *   put:
+ *     summary: Blog yazısını günceller
+ *     tags: [Blog]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: blogNo
+ *         required: true
+ *         schema:
+ *           type: number
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Blog'
+ *     responses:
+ *       200:
+ *         description: Blog başarıyla güncellendi
+ *       400:
+ *         description: Geçersiz istek
+ *       401:
+ *         description: Yetkilendirme gerekli
+ *       404:
+ *         description: Blog bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/blogs/{blogNo}:
+ *   delete:
+ *     summary: Blog yazısını siler
+ *     tags: [Blog]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: blogNo
+ *         required: true
+ *         schema:
+ *           type: number
+ *     responses:
+ *       200:
+ *         description: Blog başarıyla silindi
+ *       401:
+ *         description: Yetkilendirme gerekli
+ *       404:
+ *         description: Blog bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/ads/{ilan_no}:
+ *   put:
+ *     summary: İlan bilgilerini güncelle
+ *     tags: [İlanlar]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: ilan_no
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: İlan numarası
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Ad'
+ *     responses:
+ *       200:
+ *         description: İlan başarıyla güncellendi
+ *       401:
+ *         description: Yetkilendirme gerekli
+ *       403:
+ *         description: Admin yetkisi gerekli
+ *       404:
+ *         description: İlan bulunamadı
+ * 
+ *   delete:
+ *     summary: İlanı sil
+ *     tags: [İlanlar]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: ilan_no
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: İlan numarası
+ *     responses:
+ *       200:
+ *         description: İlan başarıyla silindi
+ *       401:
+ *         description: Yetkilendirme gerekli
+ *       403:
+ *         description: Admin yetkisi gerekli
+ *       404:
+ *         description: İlan bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/ads/my-ads:
+ *   get:
+ *     summary: Kullanıcının kendi ilanlarını getirir
+ *     tags: [İlanlar]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: İlanlar başarıyla getirildi
+ *       401:
+ *         description: Yetkilendirme hatası
+ */
+
+/**
+ * @swagger
+ * /api/ads/{ilan_no}:
+ *   put:
+ *     summary: Mevcut bir ilanı günceller
+ *     tags: [İlanlar]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: ilan_no
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Ad'
+ *     responses:
+ *       200:
+ *         description: İlan başarıyla güncellendi
+ *       403:
+ *         description: Yetkilendirme hatası
+ *       404:
+ *         description: İlan bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/ads/{ilan_no}:
+ *   delete:
+ *     summary: Bir ilanı siler
+ *     tags: [İlanlar]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: ilan_no
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: İlan başarıyla silindi
+ *       403:
+ *         description: Yetkilendirme hatası
+ *       404:
+ *         description: İlan bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/blogs:
+ *   get:
+ *     summary: Tüm blog yazılarını getirir
+ *     tags: [Blog]
+ *     responses:
+ *       200:
+ *         description: Blog yazıları başarıyla getirildi
+ */
+
+/**
+ * @swagger
+ * /api/blogs/{blogNo}:
+ *   get:
+ *     summary: Belirli bir blog yazısının detaylarını getirir
+ *     tags: [Blog]
+ *     parameters:
+ *       - in: path
+ *         name: blogNo
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Blog yazısı detayları başarıyla getirildi
+ *       404:
+ *         description: Blog yazısı bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/blogs/{blogNo}:
+ *   put:
+ *     summary: Mevcut bir blog yazısını günceller
+ *     tags: [Blog]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: blogNo
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Blog'
+ *     responses:
+ *       200:
+ *         description: Blog yazısı başarıyla güncellendi
+ *       403:
+ *         description: Yetkilendirme hatası
+ *       404:
+ *         description: Blog yazısı bulunamadı
+ */
+
+/**
+ * @swagger
+ * /api/blogs/{blogNo}:
+ *   delete:
+ *     summary: Bir blog yazısını siler
+ *     tags: [Blog]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: blogNo
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Blog yazısı başarıyla silindi
+ *       403:
+ *         description: Yetkilendirme hatası
  *       404:
  *         description: Blog yazısı bulunamadı
  */ 

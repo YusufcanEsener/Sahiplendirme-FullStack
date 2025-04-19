@@ -1,0 +1,161 @@
+/* Genel Sayfa Stilleri */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f9fafb; /* Sayfa arka planını daha yumuşak bir renk yapalım */
+    animation: fadeIn 1.5s ease-in-out; /* Sayfa yüklendiğinde yavaşça görünür */
+}
+
+.page-title {
+    font-size: 2.5rem;
+    color: #4f46e5; /* Başlık rengini mavi tonlarına yakın tutarak enerjik bir hava katıyoruz */
+    margin-bottom: 1rem;
+    text-transform: uppercase; /* Başlıkları daha dikkat çekici yapmak için büyük harf */
+    opacity: 0;
+    animation: fadeInUp 1s ease-out forwards; /* Başlık animasyonu */
+}
+
+.page-subtitle {
+    font-size: 1.25rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeInUp 1.5s ease-out forwards; /* Alt başlık animasyonu */
+    animation-delay: 0.5s; /* Biraz gecikmeli görünmesini sağlıyoruz */
+}
+
+/* Bağış Bilgisi Renkleri */
+.donation-info {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideUp 1s ease-out forwards; /* Bilgiyi kayarak gösterelim */
+    opacity: 0;
+}
+
+.donation-info p {
+    color: #374151; /* Yazı rengi daha sıcak ve okunabilir */
+    font-style: italic; /* Yazı stilini daha dikkat çekici yapalım */
+    line-height: 1.7;
+}
+
+/* Donation Grid */
+.donation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+    animation: fadeInUp 1.5s ease-out forwards; /* Bağış kartlarını yavaşça göster */
+    opacity: 0;
+    animation-delay: 1s; /* Bağış kartları biraz daha geç görünsün */
+}
+
+.donation-card {
+    background: linear-gradient(135deg, #f4f4f9, #ffffff); /* Kartlara hafif bir degrade arka plan */
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.donation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    background-color: #f3f4f6; /* Hover'da biraz renk değişimi */
+}
+
+/* Bağış kartındaki img hover animasyonu */
+.donation-card:hover img {
+    transform: scale(1.05); /* Hoverda görselleri biraz büyütüyoruz */
+    transition: transform 0.3s ease-in-out;
+}
+
+.donation-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: contain; 
+    background-color: #f9f9f9;
+    border-bottom: 3px solid #4f46e5; /* Görsellerin altına hafif bir renkli kenarlık */
+}
+
+.donation-content {
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #ffffff;
+}
+
+.donation-content h3 {
+    margin-bottom: 1rem;
+    color: #374151;
+    font-size: 1.5rem;
+}
+
+.donation-content p {
+    margin-bottom: 1.5rem;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: white;
+    background-color: #4f46e5; /* Buton rengini koyu mor yapalım */
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #4338ca; /* Hoverda biraz daha koyulaşarak etkileşim sağlıyoruz */
+}
+
+/* Butonun üzerine gelindiğinde biraz renk değişimi */
+.donation-card:hover .btn {
+    background-color: #4338ca; 
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -48,6 +48,7 @@
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
+            position: relative;
         }
 
         .blog-card:hover {
@@ -111,15 +112,30 @@
             max-height: 90vh;
             overflow-y: auto;
             border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            color: #374151;
+            margin: 0;
         }
 
         .close-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
             font-size: 1.5rem;
             cursor: pointer;
             color: #6b7280;
+            background: none;
+            border: none;
+            padding: 0.5rem;
         }
 
         .modal-image {
@@ -127,18 +143,42 @@
             max-height: 400px;
             object-fit: cover;
             border-radius: 0.5rem;
-            margin-bottom: 1.5rem;
         }
 
-        .modal-title {
-            font-size: 2rem;
-            color: #374151;
-            margin-bottom: 1rem;
+        .modal-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            padding: 1rem 0;
+            border-top: 1px solid #e5e7eb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+        }
+
+        .info-item i {
+            color: #4f46e5;
+            width: 20px;
+            text-align: center;
         }
 
         .modal-content p {
             line-height: 1.8;
             color: #4b5563;
+            margin: 0;
+        }
+
+        .modal-description {
+            font-style: italic;
+            color: #6b7280;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
             margin-bottom: 1rem;
         }
 
@@ -161,6 +201,137 @@
             color: #4f46e5;
             width: 20px;
             text-align: center;
+        }
+
+        .blog-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .ad-action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ad-action-btn:hover {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slideIn 0.3s ease-out;
+            min-width: 300px;
+        }
+
+        .notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+
+        .notification.success .notification-icon {
+            color: #10b981;
+        }
+
+        .notification.error .notification-icon {
+            color: #ef4444;
+        }
+
+        .notification.warning .notification-icon {
+            color: #f59e0b;
+        }
+
+        .notification.info .notification-icon {
+            color: #3b82f6;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message {
+            color: #6b7280;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.3s;
+        }
+
+        .notification-close:hover {
+            color: #4b5563;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
     </style>
 </head>
@@ -185,14 +356,20 @@
     <!-- Blog Detay Modal -->
     <div id="blogModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal">&times;</span>
+            <div class="modal-header">
+                <h2 class="modal-title">Blog Detayı</h2>
+                <button class="close-modal">&times;</button>
+            </div>
             <div id="modalContent">
                 <!-- Blog detayları buraya dinamik olarak eklenecek -->
             </div>
         </div>
     </div>
 
+    <div class="notification-container"></div>
+
     <script src="js/navbar.js"></script>
+    <script src="js/notification.js"></script>
     <script>
         // Admin kontrolü
         async function checkAdminStatus() {
@@ -206,20 +383,33 @@
                     });
                     const userData = await response.json();
 
-                    if (userData.isAdmin) {
+                    // Sadece isAdmin yetkisi olanlar için kontrol panelini ve butonları göster
+                    if (userData.isAdmin === 1) {
                         document.getElementById('adminControls').style.display = 'block';
+                        document.querySelectorAll('[id^="blogActions_"]').forEach(el => {
+                            el.style.display = 'flex';
+                        });
+                    } else {
+                        // Admin olmayan kullanıcılar için blog ekleme ve düzenleme butonlarını gizle
+                        document.getElementById('adminControls').style.display = 'none';
+                        document.querySelectorAll('[id^="blogActions_"]').forEach(el => {
+                            el.style.display = 'none';
+                        });
                     }
+
+                    // Blogları yükle
+                    loadBlogs(userData);
                 } catch (error) {
                     console.error('Admin kontrolü hatası:', error);
+                    loadBlogs(null);
                 }
+            } else {
+                loadBlogs(null);
             }
         }
 
-        // Sayfa yüklendiğinde admin kontrolü yap
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAdminStatus();
-            loadBlogs();
-        });
+        // Sayfa yüklendiğinde admin kontrolünü yap
+        document.addEventListener('DOMContentLoaded', checkAdminStatus);
 
         // Modal işlemleri
         const modal = document.getElementById('blogModal');
@@ -236,7 +426,7 @@
         }
 
         // Blog yazılarını getir
-        async function loadBlogs() {
+        async function loadBlogs(userData) {
             try {
                 const response = await fetch('/api/blogs');
                 const blogs = await response.json();
@@ -247,7 +437,19 @@
                 blogs.forEach(blog => {
                     const blogCard = document.createElement('div');
                     blogCard.className = 'blog-card';
+                    
+                    // Düzenleme ve silme butonlarını sadece admin kullanıcılara göster
+                    const showActions = userData && userData.isAdmin === 1;
+
                     blogCard.innerHTML = `
+                        <div class="blog-actions" style="display: ${showActions ? 'flex' : 'none'}">
+                            <button class="ad-action-btn" onclick="editBlog(${blog.blogNo})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="ad-action-btn" onclick="deleteBlog(${blog.blogNo})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                         <img src="${blog.imageUrl}" alt="${blog.title}">
                         <div class="blog-card-content">
                             <h3>${blog.title}</h3>
@@ -260,11 +462,12 @@
                                     <i class="fas fa-edit"></i>
                                     <span>Son Güncelleme: ${formatDate(blog.updatedAt)}</span>
                                 </div>
+                                <div class="blog-meta-item">
+                                    <span><i class="fa-solid fa-user"></i> ${blog.olusturanAd || blog.olusturan}</span>
+                                </div>
                             </div>
                             <p>${blog.description}</p>
-                            <a href="/blog-detail.html?id=${blog.blogNo}" class="read-more-btn">
-                                Devamını Oku
-                            </a>
+                            <a href="#" class="read-more-btn" onclick="showBlogDetail(${blog.blogNo})">Devamını Oku</a>
                         </div>
                     `;
                     blogGrid.appendChild(blogCard);
@@ -280,16 +483,43 @@
                 const response = await fetch(`/api/blogs/${blogNo}`);
                 const blog = await response.json();
 
+                if (!response.ok) {
+                    notifications.error('Blog detayları yüklenirken bir hata oluştu.', 'Yükleme Hatası');
+                    return;
+                }
+
                 const modalContent = document.getElementById('modalContent');
                 modalContent.innerHTML = `
+                    <div class="modal-header">
+                        <h2 class="modal-title">${blog.title}</h2>
+                        <button class="close-modal">&times;</button>
+                    </div>
                     <img src="${blog.imageUrl}" alt="${blog.title}" class="modal-image">
-                    <h2 class="modal-title">${blog.title}</h2>
-                    <p>${blog.content}</p>
+                    <div class="modal-info">
+                        <div class="info-item">
+                            <i class="fas fa-calendar"></i>
+                            <span>Oluşturulma: ${formatDate(blog.createdAt)}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-edit"></i>
+                            <span>Son Güncelleme: ${formatDate(blog.updatedAt)}</span>
+                        </div>
+                        <div class="blog-meta-item">
+                           <span><i class="fa-solid fa-user"></i> ${blog.olusturanAd}</span>
+                        </div>
+                    </div>
+                    <div class="modal-description">
+                        ${blog.description}
+                    </div>
+                    <div class="modal-content-text">
+                        ${blog.content}
+                    </div>
                 `;
 
                 modal.style.display = "block";
             } catch (error) {
                 console.error('Blog detayı yüklenirken hata:', error);
+                notifications.error('Blog detayları yüklenirken bir hata oluştu.', 'Sistem Hatası');
             }
         }
 
@@ -303,6 +533,41 @@
                 minute: '2-digit'
             };
             return new Date(dateString).toLocaleDateString('tr-TR', options);
+        }
+
+        // Blog silme işlemi
+        async function deleteBlog(blogNo) {
+            if (!confirm('Bu blog yazısını silmek istediğinizden emin misiniz?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/blogs/${blogNo}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    notifications.success('Blog başarıyla silindi!', 'İşlem Başarılı');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    const error = await response.json();
+                    notifications.error(error.message || 'Blog silinirken bir hata oluştu!', 'İşlem Başarısız');
+                }
+
+            } catch (error) {
+                console.error('Blog silme hatası:', error);
+                notifications.error('Blog silinirken bir hata oluştu!', 'Sistem Hatası');
+            }
+        }
+
+        // Blog düzenleme sayfasına yönlendirme
+        function editBlog(blogNo) {
+            window.location.href = `/edit-blog.html?blogNo=${blogNo}`;
         }
     </script>
 </body>

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yeni İlan - PawFinder</title>
+    <title>İlan Düzenle - PawFinder</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .create-ad-container {
+        .edit-ad-container {
             max-width: 800px;
             margin: 2rem auto;
             padding: 2rem;
@@ -75,13 +75,117 @@
             margin-top: 0.5rem;
             font-size: 0.875rem;
         }
+
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            animation: slideIn 0.3s ease-out;
+            min-width: 300px;
+        }
+
+        .notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+
+        .notification.success .notification-icon {
+            color: #10b981;
+        }
+
+        .notification.error .notification-icon {
+            color: #ef4444;
+        }
+
+        .notification.warning .notification-icon {
+            color: #f59e0b;
+        }
+
+        .notification.info .notification-icon {
+            color: #3b82f6;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message {
+            color: #6b7280;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            padding: 0.25rem;
+            transition: color 0.3s;
+        }
+
+        .notification-close:hover {
+            color: #4b5563;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="create-ad-container">
-            <h1>Yeni İlan Oluştur</h1>
-            <form id="createAdForm">
+        <div class="edit-ad-container">
+            <h1>İlan Düzenle</h1>
+            <form id="editAdForm">
                 <div class="form-group">
                     <label for="cins">Hayvan Cinsi</label>
                     <input type="text" id="cins" name="cins" class="form-control" required>
@@ -130,7 +234,7 @@
                     <input type="url" id="resim_url" name="resim_url" class="form-control" required>
                 </div>
 
-                <button type="submit" class="btn-primary">İlan Oluştur</button>
+                <button type="submit" class="btn-primary">İlanı Güncelle</button>
             </form>
         </div>
     </div>
@@ -151,34 +255,68 @@
             }
 
             try {
-                const response = await fetch('/api/profile', {
+                // Kullanıcı bilgilerini al
+                const profileResponse = await fetch('/api/profile', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                const userData = await response.json();
+                const userData = await profileResponse.json();
 
-                if (userData.role !== 'shelter') {
-                    notifications.error('Bu sayfaya erişim için barınak yetkiniz olması gerekiyor.', 'Yetkisiz Erişim');
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 1500);
+                // İlan numarasını URL'den al
+                const urlParams = new URLSearchParams(window.location.search);
+                const ilanNo = urlParams.get('ilanNo');
+
+                if (!ilanNo) {
+                    window.location.href = '/shelters.html';
                     return;
                 }
+
+                // İlan bilgilerini getir
+                const adResponse = await fetch(`/api/ads/${ilanNo}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (adResponse.ok) {
+                    const ad = await adResponse.json();
+                    
+                    // Kullanıcı bu ilanın sahibi değilse ve admin değilse erişimi engelle
+                    if (ad.olusturan !== userData.email && userData.isAdmin !== 1) {
+                        notifications.error('Bu ilanı düzenleme yetkiniz bulunmuyor.', 'Yetkisiz Erişim');
+                        setTimeout(() => {
+                            window.location.href = '/shelters.html';
+                        }, 1500);
+                        return;
+                    }
+
+                    // İlan bilgilerini forma doldur
+                    document.getElementById('cins').value = ad.cins;
+                    document.getElementById('yas').value = ad.yas;
+                    document.getElementById('cinsiyet').value = ad.cinsiyet;
+                    document.getElementById('saglik_durumu').value = ad.saglik_durumu;
+                    document.getElementById('karakter_ozellikleri').value = ad.karakter_ozellikleri;
+                    document.getElementById('bulundugu_yer').value = ad.bulundugu_yer;
+                    document.getElementById('iletisim_no').value = ad.iletisim_no;
+                    document.getElementById('hikaye').value = ad.hikaye;
+                    document.getElementById('resim_url').value = ad.resim_url;
+                } else {
+                    window.location.href = '/shelters.html';
+                }
             } catch (error) {
-                console.error('Yetki kontrolü hatası:', error);
-                window.location.href = '/';
+                console.error('Hata:', error);
+                window.location.href = '/shelters.html';
             }
         });
 
-        document.getElementById('createAdForm').addEventListener('submit', async (e) => {
+        // Form gönderimi
+        document.getElementById('editAdForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = '/login.html';
-                return;
-            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const ilanNo = urlParams.get('ilanNo');
 
             const formData = {
                 cins: document.getElementById('cins').value,
@@ -189,13 +327,12 @@
                 bulundugu_yer: document.getElementById('bulundugu_yer').value,
                 iletisim_no: document.getElementById('iletisim_no').value,
                 hikaye: document.getElementById('hikaye').value,
-                resim_url: document.getElementById('resim_url').value,
-                olusturan: localStorage.getItem('email'),
+                resim_url: document.getElementById('resim_url').value
             };
 
             try {
-                const response = await fetch('/api/ads', {
-                    method: 'POST',
+                const response = await fetch(`/api/ads/${ilanNo}`, {
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
@@ -204,17 +341,17 @@
                 });
 
                 if (response.ok) {
-                    notifications.success('İlan başarıyla oluşturuldu!', 'İşlem Başarılı');
+                    notifications.success('İlan başarıyla güncellendi!', 'İşlem Başarılı');
                     setTimeout(() => {
                         window.location.href = '/shelters.html';
                     }, 1500);
                 } else {
                     const error = await response.json();
-                    notifications.error(error.message || 'İlan oluşturulurken bir hata oluştu!', 'İşlem Başarısız');
+                    notifications.error(error.message || 'İlan güncellenirken bir hata oluştu!', 'İşlem Başarısız');
                 }
             } catch (error) {
-                console.error('İlan oluşturma hatası:', error);
-                notifications.error('İlan oluşturulurken bir hata oluştu!', 'Sistem Hatası');
+                console.error('İlan güncelleme hatası:', error);
+                notifications.error('İlan güncellenirken bir hata oluştu!', 'Sistem Hatası');
             }
         });
     </script>

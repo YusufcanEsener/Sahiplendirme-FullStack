@@ -3,63 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profil</title>
+    <title>Profil - PawFinder</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/profile.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .profile-header {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: #4f46e5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 3rem;
+            font-weight: 600;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-role {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #818cf8;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .role-user {
+            background: #6b7280;
+        }
+
+        .role-shelter {
+            background: #4f46e5;
+        }
+
+        .profile-info {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .info-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .info-group:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            min-width: 120px;
+            color: #6b7280;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-label i {
+            color: #4f46e5;
+            font-size: 1.2rem;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .password-form {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-title i {
+            color: #4f46e5;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .submit-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 640px) {
+            .info-group {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .info-label {
+                min-width: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="profile-container">
-            <h1>Profil Bilgileri</h1>
-            <div class="profile-info">
-                <div class="info-group">
-                    <label>Ad :</label>
-                    <p id="firstName"></p>
-                </div>
-                <div class="info-group">
-                    <label>Soyad:</label>
-                    <p id="lastName"></p>
-                </div>
-                <div class="info-group">
-                    <label>E-posta:</label>
-                    <p id="email"></p>
-                </div>
-                <div class="info-group">
-                    <label>Doğum Tarihi:</label>
-                    <p id="birthDate"></p>
-                </div>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                <span id="userInitials"></span>
             </div>
-            
-            <div class="password-change-section">
-                <h2>Şifre Değiştir</h2>
-                <form id="passwordChangeForm">
-                    <div class="form-group">
-                        <input type="password" id="currentPassword" placeholder="Mevcut Şifre" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="newPassword" placeholder="Yeni Şifre" required minlength="6">
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="confirmPassword" placeholder="Yeni Şifre (Tekrar)" required minlength="6">
-                    </div>
-                    <button type="submit">Şifreyi Değiştir</button>
-                </form>
+            <h1 class="profile-name">
+                <span id="firstName"></span> <span id="lastName"></span>
+            </h1>
+            <div class="profile-role" id="roleContainer">
+                <i class="fas fa-user-tag"></i>
+                <span id="role"></span>
             </div>
-            
-            <button id="logoutBtn" class="logout-btn">Çıkış Yap</button>
+        </div>
+
+        <div class="profile-info">
+            <div class="info-group">
+                <div class="info-label">
+                    <i class="fas fa-user"></i>
+                    Ad
+                </div>
+                <div class="info-value" id="firstNameInfo"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">
+                    <i class="fas fa-user"></i>
+                    Soyad
+                </div>
+                <div class="info-value" id="lastNameInfo"></div>
+            </div>
+            <div class="info-group">
+                <div class="info-label">
+                    <i class="fas fa-envelope"></i>
+                    E-posta
+                </div>
+                <div class="info-value" id="email"></div>
+            </div>
+        </div>
+
+        <div class="password-form">
+            <h2 class="form-title">
+                <i class="fas fa-lock"></i>
+                Şifre Değiştir
+            </h2>
+            <form id="passwordChangeForm">
+                <div class="form-group">
+                    <label for="currentPassword">Mevcut Şifre</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Yeni Şifre</label>
+                    <input type="password" id="newPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Yeni Şifre (Tekrar)</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-key"></i>
+                    Şifreyi Güncelle
+                </button>
+            </form>
+            <button id="logoutButton" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                Çıkış Yap
+            </button>
         </div>
     </div>
 
+    <div class="notification-container"></div>
+
     <script src="js/navbar.js"></script>
+    <script src="js/notification.js"></script>
     <script>
-        // Sayfa yüklendiğinde kullanıcı bilgilerini getir
+        // Sayfa yüklendiğinde profil bilgilerini getir
         document.addEventListener('DOMContentLoaded', async () => {
             const token = localStorage.getItem('token');
             if (!token) {
-                window.location.href = '/login.html';
+                notifications.warning('Bu sayfaya erişim için giriş yapmanız gerekmektedir.', 'Yetkisiz Erişim');
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 1500);
                 return;
             }
 
@@ -73,72 +300,90 @@
                 if (response.ok) {
                     const userData = await response.json();
                     
-                    // Kullanıcı bilgilerini sayfaya yerleştir
+                    // Kullanıcı baş harflerini ayarla
+                    const initials = `${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}`.toUpperCase();
+                    document.getElementById('userInitials').textContent = initials;
+                    
+                    // Profil bilgilerini doldur
                     document.getElementById('firstName').textContent = userData.firstName;
                     document.getElementById('lastName').textContent = userData.lastName;
+                    document.getElementById('firstNameInfo').textContent = userData.firstName;
+                    document.getElementById('lastNameInfo').textContent = userData.lastName;
                     document.getElementById('email').textContent = userData.email;
                     
-                    // Doğum tarihini formatla
-                    const birthDate = new Date(userData.birthDate);
-                    const formattedDate = birthDate.toLocaleDateString('tr-TR');
-                    document.getElementById('birthDate').textContent = formattedDate;
+                    // Rol bilgisini ayarla
+                    const roleElement = document.getElementById('role');
+                    const roleContainer = document.getElementById('roleContainer');
+                    
+                    if (userData.role === 'shelter') {
+                        roleElement.textContent = 'Barınak Sahibi';
+                        roleContainer.className = 'profile-role role-shelter';
+                    } else {
+                        roleElement.textContent = 'Kullanıcı';
+                        roleContainer.className = 'profile-role role-user';
+                    }
                 } else {
-                    // Token geçersizse login sayfasına yönlendir
-                    localStorage.removeItem('token');
-                    window.location.href = '/login.html';
+                    notifications.error('Profil bilgileri yüklenirken bir hata oluştu!', 'Yükleme Hatası');
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 1500);
                 }
             } catch (error) {
-                console.error('Profil bilgileri alınamadı:', error);
-                alert('Profil bilgileri alınamadı');
+                console.error('Profil bilgileri yükleme hatası:', error);
+                notifications.error('Profil bilgileri yüklenirken bir hata oluştu!', 'Sistem Hatası');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1500);
             }
         });
 
         // Şifre değiştirme formu
         document.getElementById('passwordChangeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const currentPassword = document.getElementById('currentPassword').value;
             const newPassword = document.getElementById('newPassword').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            
+
             if (newPassword !== confirmPassword) {
-                alert('Yeni şifreler eşleşmiyor');
+                notifications.error('Yeni şifreler eşleşmiyor!', 'Doğrulama Hatası');
                 return;
             }
-            
-            const token = localStorage.getItem('token');
-            
+
             try {
-                const response = await fetch('/api/change-password', {
+                const response = await fetch('/api/profile/change-password', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
                     },
                     body: JSON.stringify({
                         currentPassword,
                         newPassword
                     })
                 });
-                
-                const data = await response.json();
-                
+
                 if (response.ok) {
-                    alert('Şifreniz başarıyla değiştirildi');
+                    notifications.success('Şifreniz başarıyla değiştirildi!', 'İşlem Başarılı');
                     document.getElementById('passwordChangeForm').reset();
                 } else {
-                    alert(data.message || 'Şifre değiştirme başarısız');
+                    const error = await response.json();
+                    notifications.error(error.message || 'Şifre değiştirme işlemi başarısız!', 'İşlem Başarısız');
                 }
             } catch (error) {
                 console.error('Şifre değiştirme hatası:', error);
-                alert('Şifre değiştirme sırasında bir hata oluştu');
+                notifications.error('Şifre değiştirme işlemi sırasında bir hata oluştu!', 'Sistem Hatası');
             }
         });
-        
-        // Çıkış yapma
-        document.getElementById('logoutBtn').addEventListener('click', () => {
+
+        // Çıkış yapma işlemi
+        document.getElementById('logoutButton').addEventListener('click', () => {
             localStorage.removeItem('token');
-            window.location.href = '/login.html';
+            localStorage.removeItem('user');
+            notifications.info('Başarıyla çıkış yapıldı.', 'Çıkış');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1500);
         });
     </script>
 </body>

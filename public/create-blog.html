@@ -79,12 +79,185 @@
             display: none;
             margin-top: 1rem;
         }
+
+        .blog-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .blog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .blog-header h1 {
+            color: #374151;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .blog-header h1 i {
+            color: #4f46e5;
+        }
+
+        .create-blog-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .create-blog-btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .blog-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .blog-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .blog-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .blog-card-content {
+            padding: 1.5rem;
+        }
+
+        .blog-card h3 {
+            margin: 0 0 1rem 0;
+            color: #374151;
+            font-size: 1.25rem;
+            line-height: 1.4;
+        }
+
+        .blog-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .blog-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .blog-meta-item i {
+            color: #4f46e5;
+            width: 20px;
+            text-align: center;
+        }
+
+        .blog-card p {
+            color: #6b7280;
+            margin: 1rem 0;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .read-more-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .read-more-btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .read-more-btn i {
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+
+        .read-more-btn:hover i {
+            transform: translateX(3px);
+        }
+
+        .blog-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .blog-action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #4b5563;
+        }
+
+        .blog-action-btn:hover {
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="create-blog-container">
-            <h1>Yeni Blog Yazısı Oluştur</h1>
+            <h1>Yeni Blog Yazısı</h1>
             <form id="createBlogForm" class="create-blog-form">
                 <div class="form-group">
                     <label for="title">Başlık</label>
@@ -112,7 +285,10 @@
         </div>
     </div>
 
+    <div class="notification-container"></div>
+
     <script src="js/navbar.js"></script>
+    <script src="js/notification.js"></script>
     <script>
         // Sayfa yüklendiğinde admin kontrolü yap
         document.addEventListener('DOMContentLoaded', async () => {
@@ -131,7 +307,6 @@
                 const userData = await response.json();
 
                 if (!userData.isAdmin) {
-                    alert('Bu sayfaya erişim yetkiniz yok!');
                     window.location.href = '/';
                     return;
                 }
@@ -176,17 +351,18 @@
                     body: JSON.stringify(formData)
                 });
 
-                const data = await response.json();
-
                 if (response.ok) {
-                    alert('Blog yazısı başarıyla oluşturuldu!');
-                    window.location.href = '/blog.html';
+                    notifications.success('Blog yazısı başarıyla oluşturuldu!', 'İşlem Başarılı');
+                    setTimeout(() => {
+                        window.location.href = '/blog.html';
+                    }, 1500);
                 } else {
-                    alert(data.message || 'Blog yazısı oluşturulurken bir hata oluştu');
+                    const error = await response.json();
+                    notifications.error(error.message || 'Blog yazısı oluşturulurken bir hata oluştu', 'İşlem Başarısız');
                 }
             } catch (error) {
                 console.error('Hata:', error);
-                alert('Bir hata oluştu');
+                notifications.error('Bir hata oluştu. Lütfen tekrar deneyin.', 'Sistem Hatası');
             }
         });
     </script>

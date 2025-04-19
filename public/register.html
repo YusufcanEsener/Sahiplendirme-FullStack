@@ -39,6 +39,7 @@
     </div>
 
     <script src="js/navbar.js"></script>
+    <script src="js/notification.js"></script>
     <script>
         // Sayfa yüklendiğinde kullanıcı oturum durumunu kontrol et
         document.addEventListener('DOMContentLoaded', () => {
@@ -73,14 +74,16 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    alert('Kayıt başarılı! Giriş yapabilirsiniz.');
-                    window.location.href = '/login.html';
+                    notifications.success('Kayıt işleminiz başarıyla tamamlandı! Giriş sayfasına yönlendiriliyorsunuz...', 'Kayıt Başarılı');
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 2000);
                 } else {
-                    alert(data.message || 'Kayıt başarısız');
+                    notifications.error(data.message || 'Kayıt işlemi başarısız oldu. Lütfen bilgilerinizi kontrol edin.', 'Kayıt Başarısız');
                 }
             } catch (error) {
                 console.error('Hata:', error);
-                alert('Bir hata oluştu');
+                notifications.error('Bir hata oluştu. Lütfen tekrar deneyin.', 'Sistem Hatası');
             }
         });
     </script>

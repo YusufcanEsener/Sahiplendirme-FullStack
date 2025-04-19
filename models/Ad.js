@@ -5,6 +5,11 @@ const adSchema = new mongoose.Schema({
         type: Number,
         unique: true
     },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     cins: {
         type: String,
         required: true
@@ -43,24 +48,33 @@ const adSchema = new mongoose.Schema({
         required: true
     },
     olusturan: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: true
+    },
+    olusturanAd: {
+        type: String,
+        required: true
+    },
+    olusturma_tarihi: {
+        type: Date,
+        default: Date.now
     }
 }, {
-    timestamps: true // createdAt ve updatedAt alanlarını ekler
+    timestamps: true
 });
 
 // İlan numarasını otomatik artırmak için middleware
 adSchema.pre('save', async function(next) {
-    try {
-        if (this.isNew) {
+    if (this.isNew) {
+        try {
             const lastAd = await this.constructor.findOne({}, {}, { sort: { 'ilan_no': -1 } });
             this.ilan_no = lastAd ? lastAd.ilan_no + 1 : 1;
+            next();
+        } catch (error) {
+            next(error);
         }
+    } else {
         next();
-    } catch (error) {
-        next(error);
     }
 });
 

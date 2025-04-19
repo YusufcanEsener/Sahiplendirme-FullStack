@@ -20,6 +20,10 @@ const blogSchema = new mongoose.Schema({
     content: {
         type: String,
         required: true
+    },
+    olusturan: {
+        type: String,
+        required: true
     }
 }, {
     timestamps: true // Bu otomatik olarak createdAt ve updatedAt alanlarını ekler

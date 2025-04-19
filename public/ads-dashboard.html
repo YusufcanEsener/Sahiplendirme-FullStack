@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İlanlarım - PawFinder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/navbar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            color: #374151;
+            font-size: 1.8rem;
+        }
+
+        .create-ad-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .create-ad-btn:hover {
+            background: #4338ca;
+        }
+
+        .ads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .ad-card {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .ad-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .ad-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .ad-content {
+            padding: 1.5rem;
+        }
+
+        .ad-title {
+            margin: 0 0 0.5rem 0;
+            color: #374151;
+        }
+
+        .ad-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            color: #6b7280;
+        }
+
+        .ad-info span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ad-info i {
+            color: #4f46e5;
+        }
+
+        .ad-date {
+            margin: 0.5rem 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .ad-date span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ad-date i {
+            color: #4f46e5;
+        }
+
+        .ad-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .ad-action-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .ad-action-btn:hover {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .no-ads {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .no-ads i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #9ca3af;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-container">
+            <div class="dashboard-header">
+                <h1>İlanlarım</h1>
+                <a href="/create-ad.html" class="create-ad-btn">
+                    <i class="fas fa-plus"></i> Yeni İlan Ekle
+                </a>
+            </div>
+            
+            <div id="adsGrid" class="ads-grid">
+                <!-- İlanlar buraya dinamik olarak eklenecek -->
+            </div>
+        </div>
+    </div>
+
+    <div class="notification-container"></div>
+
+    <script src="js/navbar.js"></script>
+    <script src="js/notification.js"></script>
+    <script>
+        function formatDate(dateString) {
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            };
+            return new Date(dateString).toLocaleDateString('tr-TR', options);
+        }
+
+        // Sayfa yüklendiğinde kullanıcının ilanlarını getir
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/ads/my-ads', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                console.log('API yanıtı:', response);
+
+                if (response.ok) {
+                    const ads = await response.json();
+                    console.log('İlanlar:', ads);
+                    const adsGrid = document.getElementById('adsGrid');
+
+                    if (ads.length === 0) {
+                        adsGrid.innerHTML = `
+                            <div class="no-ads">
+                                <i class="fas fa-paw"></i>
+                                <h2>Henüz ilanınız bulunmuyor</h2>
+                                <p>Yeni bir ilan ekleyerek başlayabilirsiniz.</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    adsGrid.innerHTML = ads.map(ad => `
+                        <div class="ad-card">
+                            <div class="ad-actions">
+                                <button onclick="editAd('${ad.ilan_no}')" class="ad-action-btn">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteAd('${ad.ilan_no}')" class="ad-action-btn">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <img src="${ad.resim_url || 'images/default-pet.jpg'}" alt="${ad.cins}" class="ad-image">
+                            <div class="ad-content">
+                                <h3 class="ad-title">${ad.cins}</h3>
+                                <div class="ad-info">
+                                    <span><i class="fas fa-map-marker-alt"></i> ${ad.bulundugu_yer}</span>
+                                    <span><i class="fas fa-birthday-cake"></i> ${ad.yas} yaşında</span>
+                                    <span><i class="fas fa-venus-mars"></i> ${ad.cinsiyet}</span>
+                                </div>
+                                <div class="ad-date">
+                                    <span><i class="fas fa-calendar"></i> ${formatDate(ad.createdAt)}</span>
+                                </div>
+                                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                                    <a href="tel:${ad.iletisim_no}" class="btn btn-primary">Ara</a>
+                                    <a href="/ad-detay.html?id=${ad.ilan_no}" class="btn btn-secondary">Detay</a>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    const errorData = await response.json();
+                    console.error('API Hatası:', errorData);
+                    notifications.error(errorData.message || 'İlanlar yüklenirken bir hata oluştu!', 'Yükleme Hatası');
+                }
+            } catch (error) {
+                console.error('İlanlar yükleme hatası:', error);
+                notifications.error('İlanlar yüklenirken bir hata oluştu!', 'Sistem Hatası');
+            }
+        });
+
+        // İlan düzenleme fonksiyonu
+        function editAd(ilanNo) {
+            window.location.href = `/edit-ad.html?ilanNo=${ilanNo}`;
+        }
+
+        // İlan silme fonksiyonu
+        async function deleteAd(ilanNo) {
+            if (!confirm('Bu ilanı silmek istediğinizden emin misiniz?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/ads/${ilanNo}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    notifications.success('İlan başarıyla silindi!', 'İşlem Başarılı');
+                    window.location.reload();
+                } else {
+                    const errorData = await response.json();
+                    notifications.error(errorData.message || 'İlan silinirken bir hata oluştu!', 'İşlem Başarısız');
+                }
+            } catch (error) {
+                console.error('İlan silme hatası:', error);
+                notifications.error('İlan silinirken bir hata oluştu!', 'Sistem Hatası');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -30,6 +30,7 @@
     </div>
 
     <script src="js/navbar.js"></script>
+    <script src="js/notification.js"></script>
     <script>
         // Sayfa yüklendiğinde kullanıcı oturum durumunu kontrol et
         document.addEventListener('DOMContentLoaded', () => {
@@ -59,23 +60,34 @@
                 });
 
                 const data = await response.json();
+                console.log('Login yanıtı:', data); // Debug için
 
                 if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    // Kullanıcı bilgilerini localStorage'a kaydet
+                    const userInfo = {
+                        firstName: data.user.firstName,
+                        lastName: data.user.lastName,
+                        email: data.user.email,
+                        role: data.user.role, // Role bilgisini backend'den alıyoruz
+                        isAdmin: data.user.isAdmin
+                    };
                     
-                    // Admin kontrolü
-                    if (data.user.isAdmin) {
+                    console.log('Kaydedilecek kullanıcı bilgileri:', userInfo); // Debug için
+                    
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(userInfo));
+                    
+                    notifications.success('Giriş başarılı! Yönlendiriliyorsunuz...', 'Hoş Geldiniz');
+                    
+                    setTimeout(() => {
                         window.location.href = '/index.html';
-                    } else {
-                        window.location.href = '/index.html';
-                    }
+                    }, 1500);
                 } else {
-                    alert(data.message || 'Giriş başarısız');
+                    notifications.error(data.message || 'E-posta veya şifre hatalı', 'Giriş Başarısız');
                 }
             } catch (error) {
                 console.error('Hata:', error);
-                alert('Bir hata oluştu');
+                notifications.error('Bir hata oluştu. Lütfen tekrar deneyin.', 'Sistem Hatası');
             }
         });
     </script>

@@ -18,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
@@ -29,10 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 // MongoDB Bağlantısı
-mongoose.connect('mongodb://localhost:27017/remzi_db', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect('mongodb://localhost:27017/sahiplendirme-backend')
 .then(() => console.log('MongoDB bağlantısı başarılı'))
 .catch(err => console.error('MongoDB bağlantı hatası:', err));
 
@@ -60,7 +57,12 @@ app.get('/pets', (req, res) => {
 app.get('/shelters', (req, res) => {
   res.sendFile(join(__dirname, 'public', 'shelters.html'));
 });
-
+app.get('/maps', (req, res) => {
+  res.sendFile(join(__dirname, 'public', 'maps.html'));
+});
+app.get('/donate', (req, res) => {
+  res.sendFile(join(__dirname, 'public', 'donate.html'));
+});
 // JWT doğrulama middleware
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -211,17 +213,14 @@ const isAdmin = async (req, res, next) => {
     }
 };
 
-// İlan oluşturma
-app.post('/api/ads', isAdmin, async (req, res) => {
+// Kullanıcının kendi ilanlarını getir
+app.get('/api/ads/my-ads', authenticateToken, async (req, res) => {
     try {
-        const ad = new Ad({
-            ...req.body,
-            olusturan: req.user._id
-        });
-        await ad.save();
-        res.status(201).json(ad);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
+        const ads = await Ad.find({ olusturan: req.user.email }).sort({ createdAt: -1 });
+        res.json(ads);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Sunucu hatası' });
     }
 });
 
@@ -236,15 +235,110 @@ app.get('/api/ads', async (req, res) => {
 });
 
 // Tekil ilan detaylarını getir
-app.get('/api/ads/:id', async (req, res) => {
+app.get('/api/ads/:ilan_no', async (req, res) => {
     try {
-        const ad = await Ad.findById(req.params.id);
+        const ad = await Ad.findOne({ ilan_no: req.params.ilan_no });
         if (!ad) {
             return res.status(404).json({ message: 'İlan bulunamadı' });
         }
         res.json(ad);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+// İlan oluşturma
+app.post('/api/ads', authenticateToken, async (req, res) => {
+    try {
+        console.log('İlan oluşturma isteği:', req.body);
+        console.log('Kullanıcı bilgileri:', req.user);
+
+        // Kullanıcı bilgilerini veritabanından al
+        const userData = await User.findById(req.user.userId).select('firstName lastName email');
+        
+        if (!userData) {
+            return res.status(404).json({ 
+                message: 'Kullanıcı bulunamadı',
+                error: 'Kullanıcı bilgileri alınamadı'
+            });
+        }
+
+        const ad = new Ad({
+            ...req.body,
+            userId: req.user.userId,
+            olusturan: userData.email,
+            olusturanAd: `${userData.firstName} ${userData.lastName}`
+        });
+
+        console.log('Oluşturulan ilan:', ad);
+
+        const savedAd = await ad.save();
+        console.log('Kaydedilen ilan:', savedAd);
+
+        res.status(201).json(savedAd);
+    } catch (error) {
+        console.error('İlan oluşturma hatası:', error);
+        res.status(400).json({ 
+            message: 'İlan oluşturulurken bir hata oluştu',
+            error: error.message 
+        });
+    }
+});
+
+// İlan güncelleme
+app.put('/api/ads/:ilan_no', authenticateToken, async (req, res) => {
+    try {
+        const ad = await Ad.findOne({ ilan_no: req.params.ilan_no });
+        if (!ad) {
+            return res.status(404).json({ message: 'İlan bulunamadı' });
+        }
+
+        // Sadece oluşturan kişi düzenleyebilir
+        if (ad.olusturan !== req.user.email) {
+            return res.status(403).json({ message: 'Bu ilanı düzenleme yetkiniz yok' });
+        }
+
+        const updatedAd = await Ad.findOneAndUpdate(
+            { ilan_no: req.params.ilan_no },
+            {
+                cins: req.body.cins,
+                yas: req.body.yas,
+                cinsiyet: req.body.cinsiyet,
+                saglik_durumu: req.body.saglik_durumu,
+                karakter_ozellikleri: req.body.karakter_ozellikleri,
+                bulundugu_yer: req.body.bulundugu_yer,
+                iletisim_no: req.body.iletisim_no,
+                hikaye: req.body.hikaye,
+                resim_url: req.body.resim_url
+            },
+            { new: true }
+        );
+
+        res.json(updatedAd);
+    } catch (error) {
+        console.error('İlan güncelleme hatası:', error);
+        res.status(500).json({ message: 'İlan güncellenirken bir hata oluştu' });
+    }
+});
+
+// İlan silme
+app.delete('/api/ads/:ilan_no', authenticateToken, async (req, res) => {
+    try {
+        const ad = await Ad.findOne({ ilan_no: req.params.ilan_no });
+        if (!ad) {
+            return res.status(404).json({ message: 'İlan bulunamadı' });
+        }
+
+        // Sadece oluşturan kişi silebilir
+        if (ad.olusturan !== req.user.email) {
+            return res.status(403).json({ message: 'Bu ilanı silme yetkiniz yok' });
+        }
+
+        await ad.deleteOne();
+        res.json({ message: 'İlan başarıyla silindi' });
+    } catch (error) {
+        console.error('İlan silme hatası:', error);
+        res.status(500).json({ message: 'İlan silinirken bir hata oluştu' });
     }
 });
 
@@ -258,22 +352,33 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ message: 'Geçersiz email veya şifre' });
         }
 
+        // Kullanıcı bilgilerini veritabanından al
+        const userData = await User.findById(user._id).select('-password');
+
         const token = jwt.sign(
-            { userId: user._id },
+            { 
+                userId: user._id,
+                email: user.email,
+                role: user.role
+            },
             process.env.JWT_SECRET || 'pawfinder_gizli_anahtar_123',
             { expiresIn: '24h' }
         );
 
+        // Kullanıcı bilgilerini gönder
         res.json({
             token,
             user: {
                 id: user._id,
-                name: user.name,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
+                role: user.role,
                 isAdmin: user.isAdmin
             }
         });
     } catch (error) {
+        console.error('Login hatası:', error);
         res.status(500).json({ message: error.message });
     }
 });
@@ -282,7 +387,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/blogs', authenticateToken, async (req, res) => {
     try {
         console.log('Blog oluşturma isteği:', req.body);
-
+        
         const { title, description, content, imageUrl } = req.body;
         
         const blog = new Blog({
@@ -290,7 +395,7 @@ app.post('/api/blogs', authenticateToken, async (req, res) => {
             description,
             content,
             imageUrl,
-            createdAt: new Date()
+            olusturan: `${req.user.firstName} ${req.user.lastName}`
         });
         
         console.log('Oluşturulan blog:', blog);
@@ -331,6 +436,168 @@ app.get('/api/blogs/:blogNo', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+// Blog güncelleme
+app.put('/api/blogs/:blogNo', authenticateToken, async (req, res) => {
+    try {
+        const blog = await Blog.findOne({ blogNo: req.params.blogNo });
+        if (!blog) {
+            return res.status(404).json({ message: 'Blog bulunamadı' });
+        }
+
+        // Sadece oluşturan kişi düzenleyebilir
+        if (blog.olusturan !== req.user.email) {
+            return res.status(403).json({ message: 'Bu blog yazısını düzenleme yetkiniz yok' });
+        }
+
+        const updatedBlog = await Blog.findOneAndUpdate(
+            { blogNo: req.params.blogNo },
+            {
+                title: req.body.title,
+                description: req.body.description,
+                content: req.body.content,
+                imageUrl: req.body.imageUrl
+            },
+            { new: true }
+        );
+
+        res.json(updatedBlog);
+    } catch (error) {
+        console.error('Blog güncelleme hatası:', error);
+        res.status(500).json({ message: 'Blog güncellenirken bir hata oluştu' });
+    }
 });
+
+// Blog silme
+app.delete('/api/blogs/:blogNo', authenticateToken, async (req, res) => {
+    try {
+        const blog = await Blog.findOne({ blogNo: req.params.blogNo });
+        if (!blog) {
+            return res.status(404).json({ message: 'Blog bulunamadı' });
+        }
+
+        // Sadece oluşturan kişi silebilir
+        if (blog.olusturan !== req.user.email) {
+            return res.status(403).json({ message: 'Bu blog yazısını silme yetkiniz yok' });
+        }
+
+        await blog.deleteOne();
+        res.json({ message: 'Blog başarıyla silindi' });
+    } catch (error) {
+        console.error('Blog silme hatası:', error);
+        res.status(500).json({ message: 'Blog silinirken bir hata oluştu' });
+    }
+});
+
+// Kullanıcı güncelleme
+app.put('/api/users/:id', authenticateToken, async (req, res) => {
+    try {
+        const { firstName, lastName, email, birthDate } = req.body;
+        
+        // Kullanıcının kendisini veya adminin başka kullanıcıyı güncellemesine izin ver
+        if (req.user.userId !== req.params.id && !req.user.isAdmin) {
+            return res.status(403).json({ message: 'Bu işlem için yetkiniz yok' });
+        }
+
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+        }
+
+        // Email değişikliği varsa ve başka bir kullanıcı tarafından kullanılıyorsa kontrol et
+        if (email && email !== user.email) {
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({ message: 'Bu email adresi zaten kullanılıyor' });
+            }
+        }
+
+        user.firstName = firstName || user.firstName;
+        user.lastName = lastName || user.lastName;
+        user.email = email || user.email;
+        user.birthDate = birthDate ? new Date(birthDate) : user.birthDate;
+
+        await user.save();
+        res.json({ message: 'Kullanıcı başarıyla güncellendi', user });
+    } catch (error) {
+        console.error('Kullanıcı güncelleme hatası:', error);
+        res.status(500).json({ message: 'Kullanıcı güncellenirken bir hata oluştu' });
+    }
+});
+
+// Kullanıcı silme
+app.delete('/api/users/:id', authenticateToken, async (req, res) => {
+    try {
+        // Sadece admin veya kullanıcının kendisi silebilir
+        if (req.user.userId !== req.params.id && !req.user.isAdmin) {
+            return res.status(403).json({ message: 'Bu işlem için yetkiniz yok' });
+        }
+
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+        }
+
+        await user.deleteOne();
+        res.json({ message: 'Kullanıcı başarıyla silindi' });
+    } catch (error) {
+        console.error('Kullanıcı silme hatası:', error);
+        res.status(500).json({ message: 'Kullanıcı silinirken bir hata oluştu' });
+    }
+});
+
+// Tüm kullanıcıları getir (Sadece admin erişebilir)
+app.get('/api/users', authenticateToken, async (req, res) => {
+    try {
+        // Kullanıcının admin olup olmadığını kontrol et
+        const adminUser = await User.findById(req.user.userId);
+        if (!adminUser.isAdmin) {
+            return res.status(403).json({ message: 'Bu işlem için yetkiniz yok' });
+        }
+
+        // Tüm kullanıcıları getir (şifre hariç)
+        const users = await User.find().select('-password');
+        res.json(users);
+    } catch (error) {
+        console.error('Kullanıcıları getirme hatası:', error);
+        res.status(500).json({ message: 'Sunucu hatası' });
+    }
+});
+
+// Kullanıcı yetkilendirme endpoint'i
+app.put('/api/users/:userId/authorize', authenticateToken, async (req, res) => {
+    try {
+        // Admin kontrolü
+        const adminUser = await User.findById(req.user.userId);
+        if (!adminUser.isAdmin) {
+            return res.status(403).json({ message: 'Bu işlem için yetkiniz yok' });
+        }
+
+        const { userId } = req.params;
+        const { role } = req.body;
+
+        // Kullanıcıyı bul ve rolünü güncelle
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+        }
+
+        // Admin kullanıcıların rolü değiştirilemez
+        if (user.isAdmin) {
+            return res.status(403).json({ message: 'Admin kullanıcıların rolü değiştirilemez' });
+        }
+
+        user.role = role;
+        await user.save();
+
+        res.json({ message: 'Kullanıcı rolü başarıyla güncellendi' });
+    } catch (error) {
+        console.error('Yetkilendirme hatası:', error);
+        res.status(500).json({ message: 'Sunucu hatası' });
+    }
+});
+
+// Sunucuyu başlat
+const server = app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`API Dökümanı http://localhost:${PORT}/api-docs`);
+})
